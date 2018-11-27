@@ -9,9 +9,20 @@
 #import <UIKit/UIKit.h>
 #import "avformat.h"
 
+@class ZYVideoDecoder;
+
+@protocol ZYVideoDecoderDelegate <NSObject>
+
+- (void)videoDecoder:(ZYVideoDecoder *)videoDecoder didError:(NSError *)error;
+- (void)videoDecoder:(ZYVideoDecoder *)videoDecoder didChangePreferredFramesPerSecond:(NSInteger)preferredFramesPerSecond;
+
+@end
+
 @class ZYVideoFrame;
 
 @interface ZYVideoDecoder : NSObject
+
+@property (nonatomic, weak) id <ZYVideoDecoderDelegate> delegate;
 
 /**
  视频显示大小
@@ -66,7 +77,7 @@
  @param fps 帧频
  @return 视频解码器
  */
-+ (instancetype)videoDecoderWithCodecContext:(AVCodecContext *)codecContext timeBase:(NSTimeInterval)timeBase fps:(NSTimeInterval)fps;
++ (instancetype)videoDecoderWithCodecContext:(AVCodecContext *)codecContext timeBase:(NSTimeInterval)timeBase fps:(NSTimeInterval)fps delegate:(id<ZYVideoDecoderDelegate>)delegate;
 
 /**
  保存未解码的数据包

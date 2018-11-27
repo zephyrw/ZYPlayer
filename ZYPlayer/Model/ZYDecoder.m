@@ -29,7 +29,7 @@ typedef NS_ENUM(NSUInteger, ZYFFDecoderErrorCode) {
     ZYFFDecoderErrorCodeAuidoSwrInit,
 };
 
-@interface ZYDecoder()
+@interface ZYDecoder() <ZYVideoDecoderDelegate>
 
 {
     AVFormatContext *_format_context;
@@ -242,7 +242,7 @@ NSError * ZYFFCheckErrorCode(int result, NSUInteger errorCode)
             [self.videoDecoder destroy];
             self.videoDecoder = nil;
         }
-        self.videoDecoder = [ZYVideoDecoder videoDecoderWithCodecContext:codecContext timeBase:timeBase fps:fps];
+        self.videoDecoder = [ZYVideoDecoder videoDecoderWithCodecContext:codecContext timeBase:timeBase fps:fps delegate:self];
         _videoEnable = YES;
         self.videoDecoder.streamIndex = streamIndex;
     } else {
@@ -581,25 +581,35 @@ NSError * ZYFFCheckErrorCode(int result, NSUInteger errorCode)
     }
 }
 
-- (void)closeFile {
+- (void)closeFileAsync:(BOOL)async {
     
-    if (self.videoDecoder) {
-        [self.videoDecoder destroy];
-        self.videoDecoder = nil;
+    if (!self.closed) {
+        self.closed = YES;
+        if (self.videoDecoder) {
+            [self.videoDecoder destroy];
+            self.videoDecoder = nil;
+        }
+        
+        if (self.audioDecoder) {
+            [self.audioDecoder destroy];
+            self.audioDecoder = nil;
+        }
+        if (async) {
+            dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                [self.operationQueue cancelAllOperations];
+                [self.operationQueue waitUntilAllOperationsAreFinished];
+                [self closePropertyValue];
+                [self destroyFormatContext];
+                [self closeOperation];
+            });
+        } else {
+            [self.operationQueue cancelAllOperations];
+            [self.operationQueue waitUntilAllOperationsAreFinished];
+            [self closePropertyValue];
+            [self destroyFormatContext];
+            [self closeOperation];
+        }
     }
-    
-    if (self.audioDecoder) {
-        [self.audioDecoder destroy];
-        self.audioDecoder = nil;
-    }
-    
-    dispatch_async(dispatch_get_global_queue(0, 0), ^{
-        [self.operationQueue cancelAllOperations];
-        [self.operationQueue waitUntilAllOperationsAreFinished];
-        [self closePropertyValue];
-        [self destroyFormatContext];
-        [self closeOperation];
-    });
     
 }
 
@@ -671,9 +681,19 @@ NSError * ZYFFCheckErrorCode(int result, NSUInteger errorCode)
     self.operationQueue = nil;
 }
 
-- (void)dealloc
-{
-    [self closeFile];
+#pragma mark - ZYVideoDecoderDlegate
+
+- (void)videoDecoder:(ZYVideoDecoder *)videoDecoder didError:(NSError *)error {
+    self.error = error;
+    [self delegateErrorCallback];
+}
+
+- (void)closeFile {
+    [self closeFileAsync:YES];
+}
+
+- (void)dealloc {
+    [self closeFileAsync:NO];
     NSLog(@"%s", __func__);
 }
 

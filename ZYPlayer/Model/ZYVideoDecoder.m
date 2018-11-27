@@ -11,6 +11,7 @@
 #import "avformat.h"
 #import "ZYFrameQueue.h"
 #import "ZYPacketQueue.h"
+#import "ZYTools.h"
 
 @interface ZYVideoDecoder ()
 {
@@ -22,6 +23,8 @@
 @property (strong, nonatomic) ZYPacketQueue *packetQueue;
 @property (assign, nonatomic) double timebase;
 @property (assign, nonatomic) double fps;
+@property (assign, nonatomic) BOOL canceled;
+@property (nonatomic, strong) NSError * error;
 
 @end
 
@@ -29,16 +32,16 @@
 
 static AVPacket flushPacket;
 
-+ (instancetype)videoDecoderWithCodecContext:(AVCodecContext *)codecContext timeBase:(NSTimeInterval)timeBase fps:(NSTimeInterval)fps {
++ (instancetype)videoDecoderWithCodecContext:(AVCodecContext *)codecContext timeBase:(NSTimeInterval)timeBase fps:(NSTimeInterval)fps delegate:(id<ZYVideoDecoderDelegate>)delegate {
     
-    return [[self alloc] initWithCodecContext:codecContext timeBase:timeBase fps:fps];
+    return [[self alloc] initWithCodecContext:codecContext timeBase:timeBase fps:fps delegate:delegate];
     
 }
 
-- (instancetype)initWithCodecContext:(AVCodecContext *)codecContext timeBase:(NSTimeInterval)timeBase fps:(NSTimeInterval)fps
-{
+- (instancetype)initWithCodecContext:(AVCodecContext *)codecContext timeBase:(NSTimeInterval)timeBase fps:(NSTimeInterval)fps delegate:(id<ZYVideoDecoderDelegate>)delegate {
     self = [super init];
     if (self) {
+        self.delegate = delegate;
         _temp_frame = av_frame_alloc();
         self.frameQueue = [ZYFrameQueue videoQueue];
         self.packetQueue = [ZYPacketQueue packetQueueWithTimebase:timeBase];
@@ -59,6 +62,11 @@ static AVPacket flushPacket;
 - (void)startDecodeThread {
     
     while (YES) {
+        
+        if (self.canceled || self.error) {
+            NSLog(@"decode video thread quit");
+            break;
+        }
         
         if (self.endOfFile && self.packetQueue.count <= 0) {
             NSLog(@"Decode video finished!");
@@ -94,6 +102,8 @@ static AVPacket flushPacket;
         if (result < 0) {
             if (result != AVERROR(EAGAIN) && result != AVERROR_EOF) {
                 NSLog(@"Finish to send packet!");
+                self.error = ZYCheckError(result);
+                [self delegateErrorCallback];
                 break;
             }
         } else {
@@ -102,6 +112,8 @@ static AVPacket flushPacket;
                 if (result < 0) {
                     if (result != AVERROR(EAGAIN) && result != AVERROR_EOF) {
                         NSLog(@"Failed to receive frame: %d", result);
+                        self.error = ZYCheckError(result);
+                        [self delegateErrorCallback];
                     }
                 } else {
                     ZYVideoFrame *videoFrame = [self videoFrameFromTempFrame:packet.size];
@@ -114,6 +126,12 @@ static AVPacket flushPacket;
         av_packet_unref(&packet);
     }
     
+}
+
+- (void)delegateErrorCallback {
+    if (self.error) {
+        [self.delegate videoDecoder:self didError:self.error];
+    }
 }
 
 - (void)savePacket:(AVPacket)packet {
@@ -157,11 +175,13 @@ static AVPacket flushPacket;
 - (void)flush {
     [self.packetQueue flush];
     [self.frameQueue flush];
+    [self.frameQueue flushFramePool];
     [self savePacket:flushPacket];
 }
 
 - (void)destroy {
 //    NSLog(@"Release video decoder");
+    self.canceled = YES;
     [self.frameQueue destroy];
     [self.packetQueue destroy];
     [self.frameQueue flushFramePool];

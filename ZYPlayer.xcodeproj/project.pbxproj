@@ -160,6 +160,8 @@
 		F03370EF219A73DF007A0B4D /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = F03370EE219A73DF007A0B4D /* libiconv.tbd */; };
 		F03370F1219A73E9007A0B4D /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F03370F0219A73E9007A0B4D /* CoreMedia.framework */; };
 		F03370F3219A7427007A0B4D /* VideoToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F03370F2219A7427007A0B4D /* VideoToolbox.framework */; };
+		F07B84F421AD6DA4005F4441 /* ZYTools.h in Headers */ = {isa = PBXBuildFile; fileRef = F07B84F221AD6DA4005F4441 /* ZYTools.h */; };
+		F07B84F521AD6DA4005F4441 /* ZYTools.m in Sources */ = {isa = PBXBuildFile; fileRef = F07B84F321AD6DA4005F4441 /* ZYTools.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -318,6 +320,8 @@
 		F03370EE219A73DF007A0B4D /* libiconv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.tbd; path = usr/lib/libiconv.tbd; sourceTree = SDKROOT; };
 		F03370F0219A73E9007A0B4D /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 		F03370F2219A7427007A0B4D /* VideoToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VideoToolbox.framework; path = System/Library/Frameworks/VideoToolbox.framework; sourceTree = SDKROOT; };
+		F07B84F221AD6DA4005F4441 /* ZYTools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZYTools.h; sourceTree = "<group>"; };
+		F07B84F321AD6DA4005F4441 /* ZYTools.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZYTools.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -615,6 +619,8 @@
 				F0337045219A72CD007A0B4D /* ZYVideoDecoder.m */,
 				F0337047219A72CD007A0B4D /* ZYVideoFrame.h */,
 				F0337039219A72CD007A0B4D /* ZYVideoFrame.m */,
+				F07B84F221AD6DA4005F4441 /* ZYTools.h */,
+				F07B84F321AD6DA4005F4441 /* ZYTools.m */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -724,6 +730,7 @@
 				F0337058219A72CD007A0B4D /* time.h in Headers */,
 				F03370A2219A72CD007A0B4D /* version.h in Headers */,
 				F0337078219A72CD007A0B4D /* attributes.h in Headers */,
+				F07B84F421AD6DA4005F4441 /* ZYTools.h in Headers */,
 				F0337074219A72CD007A0B4D /* ffversion.h in Headers */,
 				F03370B6219A72CD007A0B4D /* avdct.h in Headers */,
 				F03370CD219A72CD007A0B4D /* ZYAudioFrame.h in Headers */,
@@ -854,6 +861,7 @@
 				F03370C4219A72CD007A0B4D /* ZYProgramYUV420.m in Sources */,
 				F033704E219A72CD007A0B4D /* GLESUtils.m in Sources */,
 				F03370C3219A72CD007A0B4D /* ZYAudioDecoder.m in Sources */,
+				F07B84F521AD6DA4005F4441 /* ZYTools.m in Sources */,
 				F03370C6219A72CD007A0B4D /* ZYAudioManager.m in Sources */,
 				F03370CB219A72CD007A0B4D /* ZYFFFrame.m in Sources */,
 				F03370C8219A72CD007A0B4D /* ZYDecoder.m in Sources */,
