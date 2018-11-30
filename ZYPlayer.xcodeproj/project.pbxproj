@@ -1012,6 +1012,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/ZYPlayer/FFmpeg-iOS/lib",
 				);
+				MACH_O_TYPE = staticlib;
 				PRODUCT_BUNDLE_IDENTIFIER = com.zephyr.ZYPlayer;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
@@ -1041,6 +1042,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/ZYPlayer/FFmpeg-iOS/lib",
 				);
+				MACH_O_TYPE = staticlib;
 				PRODUCT_BUNDLE_IDENTIFIER = com.zephyr.ZYPlayer;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
